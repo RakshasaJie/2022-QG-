@@ -1,24 +1,23 @@
+#include "LinkList.h"
 #include <stdio.h>
 #include <stdlib.h> // malloc
 
-// 链表结构初始化
-typedef struct LNode
-{
-    int data;           // 数据域
-    struct LNode *next; // 指针域
-} LNode, *LinkList;
-
 // 1.链表初始化——构造一个空表
-LinkList InitList()
+Status InitList(LinkedList *L)
 {
-    LinkList L = (LinkList)malloc(sizeof(LNode));
+    *L = (LinkedList)malloc(sizeof(LNode));
+    if (!(*L))
+    {
+        return ERROR;
+    }
+
     // 将头节点的指针域置空
-    L->next = NULL;
-    return L;
+    (*L)->next = NULL;
+    return SUCCESS;
 }
 
 // 2.在L中第i个元素前插入数据元素e
-int ListInsert(LinkList *L, int i, int e)
+int ListInsert(LinkedList *L, int i, int e)
 {
     LNode *p, *s;
     p = *L;
@@ -30,11 +29,11 @@ int ListInsert(LinkList *L, int i, int e)
     }
     if (!p || j > i)
     {
-        printf("\n发生错误，第 %d 个元素不存在，请重新操作！\n\n",i);
+        printf("\n发生错误，第 %d 个元素不存在，请重新操作！\n\n", i);
         return 0;
     }
 
-    s = (LinkList)malloc(sizeof(LNode)); // 生成新节点
+    s = (LinkedList)malloc(sizeof(LNode)); // 生成新节点
     s->data = e;
     s->next = p->next;
     p->next = s;
@@ -44,7 +43,7 @@ int ListInsert(LinkList *L, int i, int e)
 }
 
 // 3.输出链表
-void DisplayList(LinkList L)
+void DisplayList(LinkedList L)
 {
     printf("\n");
     LNode *p = L->next;
@@ -64,9 +63,9 @@ void DisplayList(LinkList L)
 }
 
 // 4.将链表反转
-LinkList ReverseList(LinkList *L)
+Status ReverseList(LinkedList *L)
 {
-    LinkList pre = NULL, p = (*L)->next, next;
+    LinkedList pre = NULL, p = (*L)->next, next;
     while (p)
     {
         next = p->next;
@@ -74,15 +73,14 @@ LinkList ReverseList(LinkList *L)
         pre = p;
         p = next;
     }
-    LinkList h = (LinkList)malloc(sizeof(LNode));
-    h->next = pre;
-    return h;
+    (*L)->next = pre;
+    return SUCCESS;
 }
 
 // 5.找到单链表中点
-int GetMid(LinkList L)
+int GetMid(LinkedList L)
 {
-    LinkList slow, fast;
+    LinkedList slow, fast;
     slow = fast = L->next;
     if (!fast)
     {
@@ -99,31 +97,32 @@ int GetMid(LinkList L)
 }
 
 // 6.判断是否成环
-int IfLoop(LinkList L){
-    LinkList slow, fast;
+Status IsLoopList(LinkedList L)
+{
+    LinkedList slow, fast;
     slow = fast = L->next;
     if (!fast)
     {
-        return 0;
+        return ERROR;
     }
     while (fast && fast->next)
     {
         slow = slow->next;
-        fast = fast->next->next;\
+        fast = fast->next->next;
 
         // 两指针相遇
-        if (slow==fast)
+        if (slow == fast)
         {
-            return 1;
+            return SUCCESS;
         }
     }
-    return 0;
+    return ERROR;
 }
 
 // 7.删除节点取值
-int ListDelete(LinkList *L, int i, int *e)
+int ListDelete(LinkedList *L, int i, int *e)
 {
-    LinkList p, q;
+    LinkedList p, q;
     p = *L;
     int j = 1;
     while (p->next && j < i) // 遍历定位
@@ -133,7 +132,7 @@ int ListDelete(LinkList *L, int i, int *e)
     }
     if (!(p->next) || j > i)
     {
-        printf("\n发生错误，第 %d 个元素不存在，请重新操作！\n\n",i);
+        printf("\n发生错误，第 %d 个元素不存在，请重新操作！\n\n", i);
         return 0;
     }
     q = p->next;
@@ -146,15 +145,15 @@ int ListDelete(LinkList *L, int i, int *e)
 }
 
 // 8.奇偶反转
-LinkList OddEvenReverse(LinkList *L)
+LinkedList ReverseEvenList(LinkedList *L)
 {
     if (!(*L)->next)
     {
-        return L;
+        return *L;
     }
-    LinkList odd = (*L)->next;
-    LinkList evenHead = odd->next;
-    LinkList even = evenHead;
+    LinkedList odd = (*L)->next;
+    LinkedList evenHead = odd->next;
+    LinkedList even = evenHead;
     while (even && even->next)
     {
         odd->next = even->next;
@@ -163,11 +162,11 @@ LinkList OddEvenReverse(LinkList *L)
         even = even->next;
     }
     odd->next = evenHead;
-    return L;
+    return *L;
 }
 
 // 9.查询数据是否在表中并获取该数据的位置序号
-int LocateNumElem(LinkList L, int e)
+int LocateNumElem(LinkedList L, int e)
 {
     LNode *p;
     p = L;
@@ -190,38 +189,57 @@ int LocateNumElem(LinkList L, int e)
 }
 
 // 10.构造循环链表
-LinkList CycleList(LinkList *L)
+LinkedList CycleList(LinkedList *L)
 {
     if (!(*L)->next)
     {
         printf("\n此表为空\n");
-        return L;
+        return *L;
     }
-    LinkList p, First;
+    LinkedList p, First;
     p = (*L)->next;
     First = p;
-    while (!p->next)
+    while (p->next)
     {
         p = p->next;
     }
     p->next = First;
     printf("\n构造成功\n");
-    return L;
+    return *L;
 }
 
 // 0.销毁删除链表
-void DestroyList(LinkList *L)
+void DestroyList(LinkedList *L)
 {
-    // 定义一个新指针
-    LinkList p;
-    while (*L)
+    LinkedList p, First;
+    // 如果链表成环
+    if (IsLoopList(*L))
     {
-        // 代替L的指向
+        First = (*L)->next;
+        // 释放头结点，保留第一个节点
         p = *L;
-        // L指向它的指针域
-        *L = (*L)->next;
-        // 删除原先L的指向
+        *L = First->next;
         free(p);
+
+        while (*L != First)
+        {
+            p = *L;
+            *L = (*L)->next;
+            free(p);
+        }
+        free(First);
+    }
+    else
+    {
+        while (*L)
+        {
+            // 代替L的指向
+            p = *L;
+            // L指向它的指针域
+            *L = (*L)->next;
+            // 删除原先L的指向
+            free(p);
+        }
     }
 }
 
@@ -243,18 +261,18 @@ int IfNum()
 int main(void)
 {
     int option;
-    LinkList L = NULL;
+    LinkedList L = NULL;
     while (1)
     {
         printf("\n\n**************************************************************\n");
-        printf("*  现在你可执行以下操作（请先创建新链表再进行其他操作）：       *\n");
-        printf("*  1.创建新链表               * *             2.插入新节点     *\n");
-        printf("*  3.输出链表                 * *             4.将链表反转     *\n");
-        printf("*  5.找到单链表中点           * *            6.判断是否成环    *\n");
-        printf("*  7.删除节点取值             * *             8.奇偶反转       *\n");
-        printf("*                     9.查询数据是否在表中                    *\n");
-        printf("*                     10.构造循环链表                         *\n");
-        printf("*                     0.删除链表并退出系统                    *\n");
+        printf("*  现在你可执行以下操作（请先创建新链表再进行其他操作）：    *\n");
+        printf("*  1.创建新链表               * *             2.插入新节点   *\n");
+        printf("*  3.输出链表                 * *             4.将链表反转   *\n");
+        printf("*  5.找到单链表中点           * *             6.判断是否成环 *\n");
+        printf("*  7.删除节点取值             * *             8.奇偶反转     *\n");
+        printf("*                     9.查询数据是否在表中                   *\n");
+        printf("*                     10.构造循环链表                        *\n");
+        printf("*                     0.删除链表并退出系统                   *\n");
         printf("**************************************************************\n");
         printf("请选择菜单编号:");
 
@@ -264,140 +282,226 @@ int main(void)
         {
         case 1:
         {
-            L = InitList();
-            printf("\n创建完成，请进行下一步操作\n\n");
+            if (L)
+            {
+                printf("\n已存在一个单链表，执行此操作前请先销毁此链表\n");
+            }
+            else
+            {
+                if (InitList(&L))
+                {
+                    printf("\n创建完成，请进行下一步操作\n");
+                }
+                else
+                {
+                    printf("分配内存失败");
+                }
+            }
+
+            break;
         }
-        break;
         case 2:
         {
-            if (IfLoop(L))
+            if (!L)
             {
-                printf("\n此链表已经成环，无法执行以下操作！\n\n");
-                continue;
+                printf("\n还未创建链表，请先扣 1 创建。\n");
             }
-            
-            int i, e;
-            printf("\n你将在第i个元素前插入数据元素e\n");
-            printf("现在请你输入i：");
-            i = IfNum();
-            printf("\n现在请你输入e：");
-            e = IfNum();
-            ListInsert(&L, i, e);
+            else
+            {
+                if (IsLoopList(L))
+                {
+                    printf("\n此链表已经成环，无法执行以下操作！\n\n");
+                    continue;
+                }
+
+                int i, e;
+                printf("\n你将在第i个元素前插入数据元素e\n");
+                printf("现在请你输入i：");
+                i = IfNum();
+                printf("\n现在请你输入e：");
+                e = IfNum();
+                ListInsert(&L, i, e);
+            }
+
+            break;
         }
-        break;
         case 3:
         {
-            if (IfLoop(L))
+            if (!L)
             {
-                printf("\n此链表已经成环，无法执行以下操作！\n\n");
-                continue;
+                printf("\n还未创建链表，请先扣 1 创建。\n");
+            }
+            else
+            {
+                if (IsLoopList(L))
+                {
+                    printf("\n此链表已经成环，无法执行以下操作！\n\n");
+                    continue;
+                }
+
+                DisplayList(L);
+                printf("\n打印完成，请进行下一步操作\n\n");
             }
 
-            DisplayList(L);
-            printf("\n打印完成，请进行下一步操作\n\n");
+            break;
         }
-        break;
         case 4:
         {
-            if (IfLoop(L))
+            if (!L)
             {
-                printf("\n此链表已经成环，无法执行以下操作！\n\n");
-                continue;
+                printf("\n还未创建链表，请先扣 1 创建。\n");
+            }
+            else
+            {
+                if (IsLoopList(L))
+                {
+                    printf("\n此链表已经成环，无法执行以下操作！\n\n");
+                    continue;
+                }
+
+                ReverseList(&L);
+                printf("\n反转完成，请进行下一步操作\n\n");
             }
 
-            L = ReverseList(&L);
-            printf("\n反转完成，请进行下一步操作\n\n");
+            break;
         }
-        break;
         case 5:
         {
-            if (IfLoop(L))
+            if (!L)
             {
-                printf("\n此链表已经成环，无法执行以下操作！\n\n");
-                continue;
+                printf("\n还未创建链表，请先扣 1 创建。\n");
+            }
+            else
+            {
+                if (IsLoopList(L))
+                {
+                    printf("\n此链表已经成环，无法执行以下操作！\n\n");
+                    continue;
+                }
+
+                GetMid(L);
+                printf("\n请进行下一步操作\n\n");
             }
 
-            GetMid(L);
-            printf("\n请进行下一步操作\n\n");
+            break;
         }
-        break;
         case 6:
         {
-            int i;
-            if (i = IfLoop(L))
+            if (!L)
             {
-                printf("\n此链表成环\n");
-            }else
-            {
-                printf("\n此链表不成环\n");
+                printf("\n还未创建链表，请先扣 1 创建。\n");
             }
-            printf("\n请进行下一步操作\n\n");
+            else
+            {
+                int i;
+                if (i = IsLoopList(L))
+                {
+                    printf("\n此链表成环\n");
+                }
+                else
+                {
+                    printf("\n此链表不成环\n");
+                }
+                printf("\n请进行下一步操作\n\n");
+            }
+
+            break;
         }
-        break;
         case 7:
         {
-            if (IfLoop(L))
+            if (!L)
             {
-                printf("\n此链表已经成环，无法执行以下操作！\n\n");
-                continue;
+                printf("\n还未创建链表，请先扣 1 创建。\n");
             }
-            
-            int i, e;
-            printf("\n你将删除第i个元素并将该元素返回为e\n");
-            printf("现在请你输入i：");
-            i = IfNum();
-            ListDelete(&L, i, &e);
-            printf("\ne = %d", e);
-            printf("\n请进行下一步操作\n\n");
+            else
+            {
+                if (IsLoopList(L))
+                {
+                    printf("\n此链表已经成环，无法执行以下操作！\n\n");
+                    continue;
+                }
+
+                int i, e;
+                printf("\n你将删除第i个元素并将该元素返回为e\n");
+                printf("现在请你输入i：");
+                i = IfNum();
+                ListDelete(&L, i, &e);
+                printf("\ne = %d", e);
+                printf("\n请进行下一步操作\n\n");
+            }
+
+            break;
         }
-        break;
         case 8:
         {
-            if (IfLoop(L))
+            if (!L)
             {
-                printf("\n此链表已经成环，无法执行以下操作！\n\n");
-                continue;
+                printf("\n还未创建链表，请先扣 1 创建。\n");
             }
-            
-            OddEvenReverse(&L);
-            printf("\n奇偶反转完成，请进行下一步操作\n\n");
+            else
+            {
+                if (IsLoopList(L))
+                {
+                    printf("\n此链表已经成环，无法执行以下操作！\n\n");
+                    continue;
+                }
+
+                ReverseEvenList(&L);
+                printf("\n奇偶反转完成，请进行下一步操作\n\n");
+            }
+
+            break;
         }
-        break;
         case 9:
         {
-            if (IfLoop(L))
+            if (!L)
             {
-                printf("\n此链表已经成环，无法执行以下操作！\n\n");
-                continue;
+                printf("\n还未创建链表，请先扣 1 创建。\n");
+            }
+            else
+            {
+                if (IsLoopList(L))
+                {
+                    printf("\n此链表已经成环，无法执行以下操作！\n\n");
+                    continue;
+                }
+
+                int e;
+                printf("\n现在请输入你想查询的数据：");
+                e = IfNum();
+                LocateNumElem(L, e);
+                printf("\n请进行下一步操作\n\n");
             }
 
-            int e;
-            printf("\n现在请输入你想查询的数据：");
-            e = IfNum();
-            LocateNumElem(L, e);
-            printf("\n请进行下一步操作\n\n");
+            break;
         }
-        break;
         case 10:
         {
-            if (IfLoop(L))
+            if (!L)
             {
-                printf("\n此链表已经成环，无法执行以下操作！\n\n");
-                continue;
+                printf("\n还未创建链表，请先扣 1 创建。\n");
             }
+            else
+            {
+                if (IsLoopList(L))
+                {
+                    printf("\n此链表已经成环，无法执行以下操作！\n\n");
+                    continue;
+                }
 
-            CycleList(&L);
-            printf("\n请进行下一步操作\n\n");
+                CycleList(&L);
+                printf("\n请进行下一步操作\n\n");
+            }
+            break;
         }
-        break;
-
         case 0: // 删除链表并退出系统
         {
             DestroyList(&L);
             printf("\n您已退出程序，拜拜！");
-            return 0;
+            exit(0);
+
+            break;
         }
-        break;
         default:
             printf("\n没有这个选项，请重新选择。\n");
             break;
