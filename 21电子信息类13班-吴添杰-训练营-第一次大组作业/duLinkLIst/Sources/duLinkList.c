@@ -1,20 +1,7 @@
-// #include "duLinkList.h"
+#include "duLinkList.h"
 #include <stdio.h>
 #include <stdlib.h>
-// define element type
-typedef int ElemType;
 
-// define struct of linked list
-typedef struct DuLNode {
-	ElemType data;
-  	struct DuLNode *prior,  *next;
-} DuLNode, *DuLinkedList;
-
-// define status
-typedef enum Status {
-	ERROR,
-	SUCCESS,
-} Status;
 // 1.用头结点初始化一个空链表
 Status InitList_DuL(DuLinkedList *L)
 {
