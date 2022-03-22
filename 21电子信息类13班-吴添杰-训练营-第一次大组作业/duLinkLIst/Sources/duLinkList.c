@@ -84,10 +84,10 @@ Status DeleteList_DuL(DuLNode *p, ElemType *e)
     }
     else
     {
-        *e=p->next->data;
-        p=p->next;
-        p->prior->next=p->next;
-        p->next->prior=p->prior;
+        *e = p->next->data;
+        p = p->next;
+        p->prior->next = p->next;
+        p->next->prior = p->prior;
         free(p);
         return SUCCESS;
     }
@@ -96,7 +96,7 @@ Status DeleteList_DuL(DuLNode *p, ElemType *e)
 // 输出函数
 void push(ElemType e)
 {
-    printf("%d <-> ", e);
+    printf("%d", e);
 }
 
 // 6.打印链表——重点：函数指针
@@ -108,6 +108,14 @@ void TraverseList_DuL(DuLinkedList L, void (*visit)(ElemType e))
     {
         visit(p->data);
         p = p->next;
+        if (p)
+        {
+            printf(" <-> ");
+        }
+        else
+        {
+            printf(" -> ");
+        }
     }
     printf("NULL");
     printf("\n");
@@ -255,7 +263,7 @@ int main()
 
                 if (DeleteList_DuL(L, &e))
                 {
-                    printf("\n数据删除成功，删除的数据为：%d\n",e);
+                    printf("\n数据删除成功，删除的数据为：%d\n", e);
                 }
                 else
                 {
