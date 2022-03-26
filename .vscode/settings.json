@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "stdio.h": "c",
+        "lqueue.h": "c",
+        "initializer_list": "c",
+        "type_traits": "c",
+        "xstring": "c",
+        "xutility": "c"
+    }
+}

@@ -1,94 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "../head/LinkStack.h"
-// // ****************************************************************
-// Status initLStack(LinkStack *s)
-// {
-//     if (!s)
-//     {
-//         printf("分配内存失败\n");
-//         return ERROR;
-//     }
-//     s->top = NULL;
-//     s->count = 0;
-//     return SUCCESS;
-// }
-// Status isEmptyLStack(LinkStack *s)
-// {
-//     if (!s->top)
-//     {
-//         return SUCCESS;
-//     }
-//     else
-//     {
-//         return ERROR;
-//     }
-// }
-// // 2.得到栈顶元素
-// Status getTopLStack(LinkStack *s, ElemType *e)
-// {
-//     if (isEmptyLStack(s))
-//     {
-//         printf("\n栈内为空\n");
-//         return ERROR;
-//     }
-//     *e = s->top->data;
-//     return SUCCESS;
-// }
-// // 3.
-// Status clearLStack(LinkStack *s)
-// {
-//     LinkStackPtr p;
-//     p = s->top;
-//     while (s->top)
-//     {
-//         s->top = s->top->next;
-//         free(p);
-//         p = s->top;
-//     }
-//     s->count = 0;
-//     return SUCCESS;
-// }
-// // 5.
-// //销毁栈
-// Status destroyLStack(LinkStack *s)
-// {
-//     clearLStack(s);
-//     free(s);
-//     return SUCCESS;
-// }
-// //检测栈长度
-// Status LStackLength(LinkStack *s, int *length)
-// {
-//     *length = s->count;
-//     return SUCCESS;
-// }
-// // 6.
-// Status pushLStack(LinkStack *s, ElemType data)
-// {
-//     LinkStackPtr p = (LinkStackPtr)malloc(sizeof(StackNode));
-//     p->next = s->top;
-//     p->data = data;
-//     s->top = p;
-//     s->count++;
-//     return SUCCESS;
-// }
-// // 7.出栈
-// Status popLStack(LinkStack *s, ElemType *data)
-// {
-//     if (isEmptyLStack(s))
-//     {
-//         printf("\n栈内为空\n");
-//         return ERROR;
-//     }
-//     *data = s->top->data;
-//     LinkStackPtr p = s->top;
-//     s->top = s->top->next;
-//     free(p);
-//     s->count--;
-//     return SUCCESS;
-// }
-// // ****************************************************************
+#include "LinkStack.c"
+
 // 判断输入是否为数字
 int IfNum()
 {
@@ -224,7 +137,6 @@ int main()
             }
             printf("\n您已退出程序，拜拜！");
             exit(0);
-            return 0;
         }
 
         default:
