@@ -5,6 +5,8 @@
         "initializer_list": "c",
         "type_traits": "c",
         "xstring": "c",
-        "xutility": "c"
-    }
+        "xutility": "c",
+        "sort.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "Disabled"
 }
